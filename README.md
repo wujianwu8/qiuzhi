@@ -17,14 +17,14 @@
 | 操作系统 | Windows 10 / macOS 12 / Ubuntu 20.04 |
 | Python | **3.10 及以上** |
 | 内存 | 512 MB |
-| 网络 | 需能访问阿里百炼 API 及 Tavily 搜索 API |
+| 网络 | 需能访问所配置的 LLM API 及 Tavily 搜索 API |
 
 ---
 
 ## 技术栈
 
 - **Python 3.10+** + **FastAPI**
-- **阿里百炼**（Qwen3.5-plus，OpenAI 兼容格式）
+- **任意 OpenAI 兼容 LLM**（通过 `BASE_URL` + `MODEL` 配置，默认示例为阿里百炼 Qwen3.5-plus）
 - **Tavily Search API**（网络搜索）
 
 ## Agent 核心组件
@@ -86,11 +86,22 @@ cp .env.example .env
 编辑 `.env`：
 
 ```
-DASHSCOPE_API_KEY=你的阿里百炼API Key
+API_KEY=你的 LLM API Key
+BASE_URL=https://api.openai.com/v1
+MODEL=gpt-4o
 TAVILY_API_KEY=你的Tavily API Key
 ```
 
-- 阿里百炼 API Key：登录 [https://bailian.console.aliyun.com/](https://bailian.console.aliyun.com/) 获取
+支持任何 OpenAI 兼容接口，例如：
+
+| 服务 | BASE_URL | MODEL 示例 |
+|------|----------|------------|
+| OpenAI | `https://api.openai.com/v1` | `gpt-4o` |
+| 阿里百炼 | `https://dashscope.aliyuncs.com/compatible-mode/v1` | `qwen-plus` |
+| DeepSeek | `https://api.deepseek.com/v1` | `deepseek-chat` |
+| 本地 Ollama | `http://localhost:11434/v1` | `llama3` |
+
+- API Key 获取：参考所选服务商的官方文档
 - Tavily API Key：注册 [https://tavily.com/](https://tavily.com/) 获取（免费额度足够测试）
 
 ### 第五步：启动服务
@@ -217,9 +228,9 @@ FastAPI 基于 Python 类型注解自动生成请求/响应校验和 OpenAPI 文
 
 本项目的会话记忆是请求级的临时状态，用 Python 内存字典（`dict`）存储足以满足演示需求，零依赖、零配置。引入 Redis 或数据库会增加部署复杂度，在验证 Agent 核心逻辑的阶段属于过度设计。
 
-**为什么选择阿里百炼 + Qwen3.5-plus？**
+**为什么选择任意 OpenAI 兼容 LLM？**
 
-阿里百炼提供 OpenAI 兼容的 API 格式，切换成本极低。Qwen3.5-plus 具备 function calling 能力，能准确判断何时调用工具、调用哪个工具，是实现 Agent 决策逻辑的基础。
+通过将 `BASE_URL`、`MODEL`、`API_KEY` 全部提取到环境变量，项目与具体服务商解耦。无论是 OpenAI、阿里百炼、DeepSeek，还是本地运行的 Ollama，只需修改 `.env` 即可切换，无需改动任何代码。选用的模型只需支持 function calling 能力即可正常工作。
 
 ---
 

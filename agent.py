@@ -5,13 +5,13 @@ from openai import OpenAI
 
 from tools import TOOLS, TOOL_FUNCTIONS
 
-# 初始化 OpenAI 格式客户端，指向阿里百炼
+# 初始化 OpenAI 兼容客户端，base_url 和 model 均从环境变量读取
 client = OpenAI(
-    api_key=os.getenv("DASHSCOPE_API_KEY"),
-    base_url="https://coding.dashscope.aliyuncs.com/v1",
+    api_key=os.getenv("API_KEY"),
+    base_url=os.getenv("BASE_URL"),
 )
 
-MODEL = "qwen3.5-plus"
+MODEL = os.getenv("MODEL", "gpt-4o")
 
 SYSTEM_PROMPT = """你是一个智能助手，只能通过以下三种工具处理用户请求：
 
